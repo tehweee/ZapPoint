@@ -16,12 +16,9 @@ class _RouteScreenState extends State<RouteScreen> {
   GoogleMapController? _controller;
   Set<Polyline> _polylines = {};
   List<LatLng> polylineCoordinates = [];
-
-  final PolylinePoints polylinePoints = PolylinePoints();
-
-  // Replace with your own Google Maps API key with Directions API enabled
   final String googleApiKey = 'AIzaSyDpwW-F7znMozHqzomo1q24dNhJ2G9I5Bs';
 
+  PolylinePoints get polylinePoints => PolylinePoints(apiKey: googleApiKey);
   @override
   void initState() {
     super.initState();
@@ -29,29 +26,36 @@ class _RouteScreenState extends State<RouteScreen> {
   }
 
   void _getRoute() async {
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey,
-      PointLatLng(widget.start.latitude, widget.start.longitude),
-      PointLatLng(widget.destination.latitude, widget.destination.longitude),
-      travelMode: TravelMode.driving,
+    final v2Response = await polylinePoints.getRouteBetweenCoordinatesV2(
+      request: RoutesApiRequest(
+        origin: PointLatLng(widget.start.latitude, widget.start.longitude),
+        destination: PointLatLng(
+          widget.destination.latitude,
+          widget.destination.longitude,
+        ),
+        travelMode: TravelMode.driving,
+      ),
     );
+    final legacyResult = polylinePoints.convertToLegacyResult(v2Response);
 
-    if (result.points.isNotEmpty) {
+    if (legacyResult.points.isNotEmpty) {
       polylineCoordinates.clear();
-      for (var point in result.points) {
+      for (var point in legacyResult.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       }
 
       setState(() {
-        _polylines.add(Polyline(
-          polylineId: PolylineId("route"),
-          color: Colors.teal,
-          width: 6,
-          points: polylineCoordinates,
-        ));
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId("route"),
+            color: Colors.teal,
+            width: 6,
+            points: polylineCoordinates,
+          ),
+        );
       });
     } else {
-      print('Error fetching route: ${result.errorMessage}');
+      print('Error fetching route: ${legacyResult.errorMessage}');
     }
   }
 
@@ -60,10 +64,7 @@ class _RouteScreenState extends State<RouteScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Route")),
       body: GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: widget.start,
-          zoom: 14,
-        ),
+        initialCameraPosition: CameraPosition(target: widget.start, zoom: 14),
         markers: {
           Marker(markerId: MarkerId("start"), position: widget.start),
           Marker(markerId: MarkerId("end"), position: widget.destination),

@@ -1,7 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'ChargingListPage.dart';
+import 'IntroPage.dart';
 
-void main() => runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -18,11 +25,21 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 2,
         ),
-        textTheme: TextTheme(
-          bodyMedium: TextStyle(fontSize: 16),
-        ),
+        textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
       ),
-      home: ChargerListScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (asyncSnapshot.data != null) {
+            return ChargerListScreen();
+          }
+          return LoadingScreen();
+        },
+      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

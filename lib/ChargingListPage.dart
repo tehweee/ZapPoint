@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -36,7 +37,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
   void initState() {
     super.initState();
     _determinePosition();
-    _loadChargers();
+    // _loadChargers();
   }
 
   Future<void> _determinePosition() async {
@@ -62,7 +63,8 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
 
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.high,
+      );
       _currentPosition = position;
       setState(() {
         _initialPosition = LatLng(position.latitude, position.longitude);
@@ -119,7 +121,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                 color: Colors.black26,
                 blurRadius: 10,
                 offset: Offset(0, -2),
-              )
+              ),
             ],
           ),
           child: Column(
@@ -127,7 +129,11 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
             children: [
               Text(
                 charger.name,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
               SizedBox(height: 8),
 
@@ -143,11 +149,17 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                 ),
 
               SizedBox(height: 8),
-              Text(charger.formattedAddress, style: TextStyle(color: Colors.black87)),
+              Text(
+                charger.formattedAddress,
+                style: TextStyle(color: Colors.black87),
+              ),
 
               if (charger.phoneNumber != null) ...[
                 SizedBox(height: 4),
-                Text('Phone: ${charger.phoneNumber}', style: TextStyle(color: Colors.grey[700])),
+                Text(
+                  'Phone: ${charger.phoneNumber}',
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
               ],
 
               if (charger.rating != null || charger.reviewCount != null) ...[
@@ -171,23 +183,28 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
               ],
 
               SizedBox(height: 8),
-              Text('Connectors:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                'Connectors:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
 
-              ...charger.connectors.map((c) => Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.ev_station, size: 20, color: Colors.green),
-                    SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        '${c.type} - ${c.available}/${c.total} available, ${c.kw}kW (${c.speed})',
-                        style: TextStyle(fontSize: 14),
+              ...charger.connectors.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.ev_station, size: 20, color: Colors.green),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          '${c.type} - ${c.available}/${c.total} available, ${c.kw}kW (${c.speed})',
+                          style: TextStyle(fontSize: 14),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              )),
+              ),
 
               if (charger.website != null) ...[
                 SizedBox(height: 8),
@@ -271,7 +288,10 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
       _markers = {
         Marker(
           markerId: MarkerId('currentLocation'),
-          position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          position: LatLng(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+          ),
           infoWindow: InfoWindow(title: 'Your Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         ),
@@ -286,93 +306,105 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
       polylineCoordinates.clear();
     });
 
-    final polylinePoints = PolylinePoints();
-    final result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey,
-      PointLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-      PointLatLng(charger.latitude, charger.longitude),
-      travelMode: TravelMode.driving,
+    final polylinePoints = PolylinePoints(apiKey: googleApiKey);
+    final v2Response = await polylinePoints.getRouteBetweenCoordinatesV2(
+      request: RoutesApiRequest(
+        origin: PointLatLng(
+          _currentPosition!.latitude,
+          _currentPosition!.longitude,
+        ),
+        destination: PointLatLng(charger.latitude, charger.longitude),
+        travelMode: TravelMode.driving,
+      ),
     );
+    final legacyResult = polylinePoints.convertToLegacyResult(v2Response);
 
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
+    if (legacyResult.points.isNotEmpty) {
+      for (var point in legacyResult.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       }
 
       setState(() {
-        _polylines.add(Polyline(
-          polylineId: PolylineId('route'),
-          color: Colors.teal,
-          width: 6,
-          points: polylineCoordinates,
-        ));
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId('route'),
+            color: Colors.teal,
+            width: 6,
+            points: polylineCoordinates,
+          ),
+        );
       });
     } else {
-      print('Error fetching route: ${result.errorMessage}');
+      print('Error fetching route: ${legacyResult.errorMessage}');
     }
 
     final controller = await _mapController.future;
     controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
 
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
-    ).listen((Position position) async {
-      _currentPosition = position;
-
-      LatLng currentLatLng = LatLng(position.latitude, position.longitude);
-
-      setState(() {
-        _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
-        _markers.add(Marker(
-          markerId: MarkerId('currentLocation'),
-          position: currentLatLng,
-          infoWindow: InfoWindow(title: 'Your Location'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        ));
-      });
-
-      await controller.animateCamera(CameraUpdate.newLatLng(currentLatLng));
-
-      final distance = Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        charger.latitude,
-        charger.longitude,
-      );
-
-      if (distance < 20) {
-        await _positionStreamSubscription?.cancel();
-
-        setState(() {
-          _isRouting = false;
-          _selectedCharger = null;
-          _polylines.clear();
-          polylineCoordinates.clear();
-        });
-
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('You have reached your destination!'),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await _restoreAllChargers();
-                  controller.animateCamera(
-                    CameraUpdate.newLatLngZoom(_initialPosition, 14),
-                  );
-                },
-                child: Text('OK'),
-              ),
-            ],
+    _positionStreamSubscription =
+        Geolocator.getPositionStream(
+          locationSettings: LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 10,
           ),
-        );
-      }
-    });
+        ).listen((Position position) async {
+          _currentPosition = position;
+
+          LatLng currentLatLng = LatLng(position.latitude, position.longitude);
+
+          setState(() {
+            _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+            _markers.add(
+              Marker(
+                markerId: MarkerId('currentLocation'),
+                position: currentLatLng,
+                infoWindow: InfoWindow(title: 'Your Location'),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueBlue,
+                ),
+              ),
+            );
+          });
+
+          await controller.animateCamera(CameraUpdate.newLatLng(currentLatLng));
+
+          final distance = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            charger.latitude,
+            charger.longitude,
+          );
+
+          if (distance < 20) {
+            await _positionStreamSubscription?.cancel();
+
+            setState(() {
+              _isRouting = false;
+              _selectedCharger = null;
+              _polylines.clear();
+              polylineCoordinates.clear();
+            });
+
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('You have reached your destination!'),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await _restoreAllChargers();
+                      controller.animateCamera(
+                        CameraUpdate.newLatLngZoom(_initialPosition, 14),
+                      );
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        });
   }
 
   Future<void> _restoreAllChargers() async {
@@ -406,9 +438,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
     await _restoreAllChargers();
 
     final controller = await _mapController.future;
-    controller.animateCamera(
-      CameraUpdate.newLatLngZoom(_initialPosition, 14),
-    );
+    controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -454,7 +484,10 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
           children: [
             GoogleMap(
               onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(target: _initialPosition, zoom: 14),
+              initialCameraPosition: CameraPosition(
+                target: _initialPosition,
+                zoom: 14,
+              ),
               myLocationEnabled: _locationPermissionGranted,
               myLocationButtonEnabled: true,
               markers: _markers,
@@ -482,7 +515,9 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                       context: context,
                       builder: (_) => AlertDialog(
                         title: Text('End Route?'),
-                        content: Text('Are you sure you want to end the route?'),
+                        content: Text(
+                          'Are you sure you want to end the route?',
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
@@ -505,6 +540,25 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          await FirebaseAuth.instance.signOut();
+        },
+        label: const Text(
+          'Logout',
+          style: TextStyle(
+            color: Color(0xFF1A1A40),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        icon: const Icon(Icons.login),
+        backgroundColor: const Color(0xFFFFDD00), // Yellow background
+        foregroundColor: const Color(0xFF1A1A40), // Dark blue icon color
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

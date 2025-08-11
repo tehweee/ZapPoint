@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "803630380925",
+    "project_id": "zappoint-9e334",
+    "storage_bucket": "zappoint-9e334.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803630380925:android:dda6177efdd19ad44c7e14",
+        "android_client_info": {
+          "package_name": "com.example.testing_rapidapi_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPLrktlbWamsmFNJct4nKgg2RLuXZcFaU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
