@@ -41,10 +41,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
               ),
             ),
             SizedBox(height: 20.0),
-            Image.asset(
-              'assets/ZapPoint_Logo_Transparent.png', // Replace with the path to your image
-              height: 100.0,
-            ),
+            Image.asset('assets/ZapPoint_Logo_Transparent.png', height: 100.0),
           ],
         ),
       ),

@@ -51,13 +51,10 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Define the colors from the image
-    const Color _primaryColor = Color(0xFF00BFFF); // Bright blue background
-    const Color _darkTextColor = Color(0xFF1A1A40); // Dark blue text/icon
-    const Color _accentColor = Color(0xFFFFDD00); // Yellow for icons
-    const Color _logoutButtonColor = Color(
-      0xFFFF5252,
-    ); // Red for the logout buttonr
+    const Color _primaryColor = Color(0xFF00BFFF);
+    const Color _darkTextColor = Color(0xFF1A1A40);
+    const Color _accentColor = Color(0xFFFFDD00);
+    const Color _logoutButtonColor = Color(0xFFFF5252);
 
     return Scaffold(
       backgroundColor: _primaryColor,
@@ -85,7 +82,6 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
           children: [
             const SizedBox(height: 30),
 
-            // Profile Picture Section
             Center(
               child: Column(
                 children: [
@@ -96,7 +92,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                         ? ClipOval(
                             child: Image.file(
                               File(pickedFile!.path!),
-                              width: 100, // Diameter = radius * 2
+                              width: 100,
                               height: 100,
                               fit: BoxFit.cover,
                             ),
@@ -134,7 +130,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Email", // ✅ Capitalize field name
+                        "Email",
                         style: const TextStyle(
                           color: _darkTextColor,
                           fontSize: 18,
@@ -186,7 +182,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Username", // ✅ Capitalize field name
+                        "Username",
                         style: const TextStyle(
                           color: _darkTextColor,
                           fontSize: 18,
@@ -219,7 +215,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                           ),
                           IconButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ChangeUsernameScreen(),
@@ -263,7 +259,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
 
                           IconButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ChangePasswordScreen(),
@@ -288,7 +284,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Vehicle", // ✅ Capitalize field name
+                        "Vehicle",
                         style: const TextStyle(
                           color: _darkTextColor,
                           fontSize: 18,
@@ -321,7 +317,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                           ),
                           IconButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => SelectVehiclePage(),
@@ -340,10 +336,9 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
             ),
             const SizedBox(height: 60),
 
-            // Logout Button
             ElevatedButton(
               onPressed: () async {
-                await FirebaseAuth.instance.signOut(); // ✅ Firebase logout
+                await FirebaseAuth.instance.signOut();
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => LoadingScreen()),
                 );

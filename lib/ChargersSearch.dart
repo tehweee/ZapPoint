@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final chargersSearch = chargersSearchFromJson(jsonString);
-
 import 'dart:convert';
 
 ChargersSearch chargersSearchFromJson(String str) =>

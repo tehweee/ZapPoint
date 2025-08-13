@@ -66,7 +66,6 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
           .map((img) => {'alt': img.alt, 'src': img.src})
           .toList(),
 
-      // Specifications
       'specifications': {
         'title': vehicle.specifications!.title,
 
@@ -278,7 +277,6 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
           ? const Center(child: Text('No vehicles found'))
           : Column(
               children: [
-                // Compact selected vehicle preview on top as a row
                 Container(
                   color: Colors.white.withOpacity(0.9),
                   padding: const EdgeInsets.symmetric(
@@ -290,7 +288,6 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
                       FutureBuilder<String?>(
                         future: getVehicleImage(),
                         builder: (context, snapshot) {
-                          // While waiting, you can show a placeholder image
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return CircleAvatar(
@@ -302,7 +299,6 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
                             );
                           }
 
-                          // If image URL from Firestore exists, use it; otherwise fallback
                           final imageUrl =
                               snapshot.data ?? selectedVehicle!.image;
 
@@ -437,7 +433,6 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
 
                 const Divider(color: Colors.white54, thickness: 1),
 
-                // Expanded list of vehicles with image left, info right
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(

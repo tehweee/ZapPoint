@@ -63,31 +63,28 @@ class _RegisterPageState extends State<RegisterPage> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A40), // Dark blue background
-      resizeToAvoidBottomInset:
-          false, // Prevents screen from resizing when keyboard appears
+      backgroundColor: const Color(0xFF1A1A40),
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: <Widget>[
-          // Register title section
           Padding(
             padding: EdgeInsets.only(top: screenSize.height * 0.15),
             child: const Text(
               'Register',
               style: TextStyle(
-                color: Color(0xFFFFDD00), // Yellow font
+                color: Color(0xFFFFDD00),
                 fontSize: 40.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
 
-          const Spacer(), // Pushes the content to the bottom
-          // Main content container with text fields and button
+          const Spacer(),
           Container(
             width: screenSize.width,
-            height: screenSize.height * 0.65, // Responsive height
+            height: screenSize.height * 0.65,
             decoration: const BoxDecoration(
-              color: Color(0xFF21A5BF), // Light blue background
+              color: Color(0xFF21A5BF),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(50.0),
                 topRight: Radius.circular(50.0),
@@ -98,7 +95,6 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  // Email text field
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -129,8 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 30.0), // Space between fields
-                  // Username text field
+                  const SizedBox(height: 30.0),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -161,8 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 30.0), // Space between fields
-                  // Password text field
+                  const SizedBox(height: 30.0),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -179,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   TextFormField(
                     controller: passwordController,
-                    obscureText: true, // Hides the password
+                    obscureText: true,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -194,17 +188,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 50.0), // Space before button
-                  // Register button
+                  const SizedBox(height: 50.0),
                   ElevatedButton(
                     onPressed: () async {
                       await createUser();
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(
-                        double.infinity,
-                        50,
-                      ), // Full width
+                      minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
@@ -225,7 +215,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Navigates to the Login page and replaces the current page in the stack
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -239,8 +228,8 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         icon: const Icon(Icons.login),
-        backgroundColor: const Color(0xFFFFDD00), // Yellow background
-        foregroundColor: const Color(0xFF1A1A40), // Dark blue icon color
+        backgroundColor: const Color(0xFFFFDD00),
+        foregroundColor: const Color(0xFF1A1A40),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
         ),

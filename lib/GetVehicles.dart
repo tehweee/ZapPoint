@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final getVehicles = getVehiclesFromJson(jsonString);
-
 import 'dart:convert';
 
 GetVehicles getVehiclesFromJson(String str) =>

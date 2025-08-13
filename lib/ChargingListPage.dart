@@ -316,7 +316,6 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
-              // Safe mapping for nullable connectors
               ...?charger.connectors?.map(
                 (c) => Padding(
                   padding: const EdgeInsets.only(top: 4.0),
@@ -399,175 +398,6 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
       },
     );
   }
-
-  // void _showChargerBottomSheetSearch(DatumSearch charger) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     shape: RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-  //     ),
-  //     builder: (context) {
-  //       return Container(
-  //         padding: EdgeInsets.all(16),
-  //         height: 460,
-  //         decoration: BoxDecoration(
-  //           color: Colors.white,
-  //           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-  //           boxShadow: [
-  //             BoxShadow(
-  //               color: Colors.black26,
-  //               blurRadius: 10,
-  //               offset: Offset(0, -2),
-  //             ),
-  //           ],
-  //         ),
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             Text(
-  //               charger.name ?? "",
-  //               style: TextStyle(
-  //                 fontSize: 20,
-  //                 fontWeight: FontWeight.bold,
-  //                 color: Colors.black87,
-  //               ),
-  //             ),
-  //             SizedBox(height: 8),
-
-  //             if (charger.photo != null)
-  //               ClipRRect(
-  //                 borderRadius: BorderRadius.circular(8),
-  //                 child: Image.network(
-  //                   charger.photo!,
-  //                   height: 120,
-  //                   width: double.infinity,
-  //                   fit: BoxFit.cover,
-  //                 ),
-  //               ),
-
-  //             SizedBox(height: 8),
-  //             Text(
-  //               charger.formattedAddress ?? "",
-  //               style: TextStyle(color: Colors.black87),
-  //             ),
-
-  //             if (charger.phoneNumber != null) ...[
-  //               SizedBox(height: 4),
-  //               Text(
-  //                 'Phone: ${charger.phoneNumber}',
-  //                 style: TextStyle(color: Colors.grey[700]),
-  //               ),
-  //             ],
-
-  //             if (charger.rating != null || charger.reviewCount != null) ...[
-  //               SizedBox(height: 4),
-  //               Row(
-  //                 children: [
-  //                   if (charger.rating != null)
-  //                     Row(
-  //                       children: [
-  //                         Icon(Icons.star, color: Colors.amber, size: 18),
-  //                         SizedBox(width: 4),
-  //                         Text('${charger.rating}'),
-  //                       ],
-  //                     ),
-  //                   if (charger.reviewCount != null) ...[
-  //                     SizedBox(width: 10),
-  //                     Text('(${charger.reviewCount} reviews)'),
-  //                   ],
-  //                 ],
-  //               ),
-  //             ],
-
-  //             SizedBox(height: 8),
-  //             Text(
-  //               'Connectors:',
-  //               style: TextStyle(fontWeight: FontWeight.bold),
-  //             ),
-
-  //             ...charger.connectors?.map(
-  //                   (c) => Padding(
-  //                     padding: const EdgeInsets.only(top: 4.0),
-  //                     child: Row(
-  //                       children: [
-  //                         Icon(Icons.ev_station, size: 20, color: Colors.green),
-  //                         SizedBox(width: 6),
-  //                         Expanded(
-  //                           child: Text(
-  //                             '${c.type} - ${c.available}/${c.total} available, ${c.kw}kW (${c.speed})',
-  //                             style: TextStyle(fontSize: 14),
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                 ) ??
-  //                 [],
-
-  //             if (charger.website != null) ...[
-  //               SizedBox(height: 8),
-  //               InkWell(
-  //                 child: Text(
-  //                   'Visit Website',
-  //                   style: TextStyle(
-  //                     color: Colors.indigo,
-  //                     decoration: TextDecoration.underline,
-  //                     fontWeight: FontWeight.w500,
-  //                   ),
-  //                 ),
-  //                 onTap: () async {
-  //                   final url = charger.website!;
-  //                   if (await canLaunch(url)) {
-  //                     await launch(url);
-  //                   }
-  //                 },
-  //               ),
-  //             ],
-
-  //             if (charger.placeLink != null) ...[
-  //               SizedBox(height: 4),
-  //               InkWell(
-  //                 child: Text(
-  //                   'View on Google Maps',
-  //                   style: TextStyle(
-  //                     color: Colors.indigo,
-  //                     decoration: TextDecoration.underline,
-  //                     fontWeight: FontWeight.w500,
-  //                   ),
-  //                 ),
-  //                 onTap: () async {
-  //                   final url = charger.placeLink!;
-  //                   if (await canLaunch(url)) {
-  //                     await launch(url);
-  //                   }
-  //                 },
-  //               ),
-  //             ],
-
-  //             Spacer(),
-
-  //             ElevatedButton.icon(
-  //               icon: Icon(Icons.directions, color: Colors.black),
-  //               label: Text('Route Now', style: TextStyle(color: Colors.black)),
-  //               style: ElevatedButton.styleFrom(
-  //                 backgroundColor: Color(0xFFFFD54F),
-  //                 minimumSize: Size(double.infinity, 48),
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(12),
-  //                 ),
-  //                 elevation: 4,
-  //               ),
-  //               onPressed: () {
-  //                 Navigator.pop(context);
-  //                 _startRoutingToSearch(charger);
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   void _showChargerBottomSheet(Datum charger) {
     showModalBottomSheet(
@@ -1242,6 +1072,11 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                     IconButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => LoadingScreen(),
+                          ),
+                        );
                       },
                       icon: const Icon(Icons.login),
                     ),

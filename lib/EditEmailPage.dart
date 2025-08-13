@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'EditProfilePage.dart';
 
 class ChangeEmailScreen extends StatefulWidget {
   const ChangeEmailScreen({Key? key}) : super(key: key);
@@ -50,21 +51,19 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
     }
 
     try {
-      // Step 1: Reauthenticate the user
       final credential = EmailAuthProvider.credential(
         email: user.email!,
         password: currentPassword,
       );
       await user.reauthenticateWithCredential(credential);
 
-      // Step 2: Update email in Firebase Auth
-      // await user.updateEmail(newEmail);
       await user.verifyBeforeUpdateEmail(newEmail);
-      // Step 3: Update email in Firestore
 
-      // Success! Pop back to previous screen or show message
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => EditAccountScreen()),
+        );
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -94,7 +93,12 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: darkTextColor),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => EditAccountScreen()),
+            );
+          },
         ),
         title: const Text(
           'Change Email',

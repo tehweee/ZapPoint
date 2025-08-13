@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'fire-setup-65a34.firebasestorage.app',
     iosBundleId: 'com.example.testingRapidapi2',
   );
-
 }

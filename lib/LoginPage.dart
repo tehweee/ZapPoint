@@ -42,33 +42,29 @@ class _LoginPageState extends State<LoginPage> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A40), // Dark blue background
-      resizeToAvoidBottomInset:
-          false, // Prevents screen from resizing when keyboard appears
+      backgroundColor: const Color(0xFF1A1A40),
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: <Widget>[
-          // Login title section
           Padding(
             padding: EdgeInsets.only(top: screenSize.height * 0.15),
             child: const Text(
               'Login',
               style: TextStyle(
-                color: Color(0xFFFFDD00), // Yellow font
+                color: Color(0xFFFFDD00),
                 fontSize: 40.0,
                 fontWeight: FontWeight.bold,
-                // fontFamily: 'Montserrat', // Ensure this font is configured
               ),
             ),
           ),
 
-          const Spacer(), // Pushes the content to the bottom
-          // Main content container with text fields and button
+          const Spacer(),
           Container(
             width: screenSize.width,
-            height: screenSize.height * 0.65, // Responsive height
+            height: screenSize.height * 0.65,
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             decoration: const BoxDecoration(
-              color: Color(0xFF21A5BF), // Light blue background
+              color: Color(0xFF21A5BF),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(50.0),
                 topRight: Radius.circular(50.0),
@@ -77,7 +73,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // Email text field
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -108,8 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                const SizedBox(height: 30.0), // Space between fields
-                // Password text field
+                const SizedBox(height: 30.0),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -126,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 TextFormField(
                   controller: passwordController,
-                  obscureText: true, // Hides the password
+                  obscureText: true,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -141,14 +135,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                const SizedBox(height: 50.0), // Space before button
-                // Login button
+                const SizedBox(height: 50.0),
                 ElevatedButton(
                   onPressed: () async {
                     await loginUser();
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50), // Full width
+                    minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -168,7 +161,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Navigates to the Register page and replaces the current page in the stack
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const RegisterPage()),
@@ -182,8 +174,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         icon: const Icon(Icons.login),
-        backgroundColor: const Color(0xFFFFDD00), // Yellow background
-        foregroundColor: const Color(0xFF1A1A40), // Dark blue icon color
+        backgroundColor: const Color(0xFFFFDD00),
+        foregroundColor: const Color(0xFF1A1A40),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
         ),
