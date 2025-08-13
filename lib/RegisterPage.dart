@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'LoginPage.dart';
+import 'ChargingListPage.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -29,11 +31,31 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       final userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      await userCredential.user?.updateDisplayName(username);
-      await userCredential.user?.reload();
+      final user = FirebaseAuth.instance.currentUser;
+      await user?.updateDisplayName(username ?? "User");
+
+      final uid = userCredential.user!.uid;
+      await uploadUserToDb(uid);
       print(userCredential);
     } on FirebaseAuthException catch (e) {
       print('Failed to create user: ${e.message}');
+    }
+  }
+
+  Future<void> uploadUserToDb(String uid) async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final username = usernameController.text.trim();
+    try {
+      final data = FirebaseFirestore.instance.collection("account")
+        ..doc(uid).set({"vehicle": null, "profile_pic": null});
+      print(data);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ChargerListScreen()),
+      );
+    } catch (e) {
+      print(e);
     }
   }
 

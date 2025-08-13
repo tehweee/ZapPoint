@@ -30,6 +30,17 @@ class MyApp extends StatelessWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, asyncSnapshot) {
+          print("""
+          ======================================
+            Async Snapshot Information
+          ======================================
+            Connection State: ${asyncSnapshot.connectionState}
+            Has Data: ${asyncSnapshot.hasData}
+            Has Error: ${asyncSnapshot.hasError}
+            Error: ${asyncSnapshot.error}
+            Data: ${asyncSnapshot.data}
+          ======================================
+          """);
           if (asyncSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
