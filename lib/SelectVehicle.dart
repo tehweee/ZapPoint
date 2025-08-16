@@ -7,6 +7,7 @@ import 'httpservice_vehicle.dart' hide HttpServiceVehicles;
 import 'httpservice_vehicledetails.dart';
 import 'httpservice_vehicle.dart';
 import 'GetVehicleDetails.dart';
+import 'ChargingListPage.dart';
 
 class SelectVehiclePage extends StatefulWidget {
   const SelectVehiclePage({Key? key}) : super(key: key);
@@ -256,7 +257,12 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: darkTextColor),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ChargerListScreen()),
+            );
+          },
         ),
         title: const Text(
           'Select Vehicle',
