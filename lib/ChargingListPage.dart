@@ -18,29 +18,29 @@ import 'const.dart';
 
 class ChargerListScreen extends StatefulWidget {
   @override
-  _ChargerListScreenState createState() => _ChargerListScreenState();
+  ChargerListScreenState createState() => ChargerListScreenState();
 }
 
-class _ChargerListScreenState extends State<ChargerListScreen> {
-  final Completer<GoogleMapController> _mapController = Completer();
-  Set<Marker> _markers = {};
-  Set<Polyline> _polylines = {};
+class ChargerListScreenState extends State<ChargerListScreen> {
+  final Completer<GoogleMapController> mapController = Completer();
+  Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
   final TextEditingController searchAreaController = TextEditingController();
 
-  LatLng _initialPosition = LatLng(1.438, 103.786);
+  LatLng initialPosition = LatLng(1.438, 103.786);
 
-  bool _locationPermissionGranted = false;
-  bool _isLoadingLocation = true;
+  bool locationPermissionGranted = false;
+  bool isLoadingLocation = true;
 
-  Position? _currentPosition;
-  StreamSubscription<Position>? _positionStreamSubscription;
-  Map<String, dynamic>? _selectedRecentCharger;
+  Position? currentPosition;
+  StreamSubscription<Position>? positionStreamSubscription;
+  Map<String, dynamic>? selectedRecentCharger;
 
-  Datum? _selectedCharger;
-  DatumSearch? _selectedChargerSearch;
+  Datum? selectedCharger;
+  DatumSearch? selectedChargerSearch;
 
-  bool _isRouting = false;
+  bool isRouting = false;
   TextEditingController areaQuery = TextEditingController();
 
   final String googleApiKey = GOOGLE_MAP_API;
@@ -49,11 +49,12 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
   @override
   void initState() {
     super.initState();
-    _determinePosition();
-    //_loadChargers();
-    _loadRecentChargers();
+    determinePosition();
+    //loadChargers();
+    loadRecentChargers();
   }
 
+  //Enable Bottom filter sheet to show the filter for ev charger port
   void showFilterBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -88,7 +89,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: Colors.black,
                         blurRadius: 10,
                         offset: Offset(0, -2),
                       ),
@@ -102,7 +103,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 12),
@@ -129,7 +130,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 4),
@@ -180,7 +181,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 4),
@@ -204,7 +205,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                           style: TextStyle(color: Colors.black),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFFD54F),
+                          backgroundColor: Color(0xFFFFDD00),
                           minimumSize: Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -220,6 +221,7 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
                             maxKWValue.toString(),
                             limitCounter.toString(),
                           );
+                          areaQuery.clear();
                         },
                       ),
                     ],
@@ -233,7 +235,8 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
     );
   }
 
-  Future<LocationData?> _getLocaiton() async {
+  //Get the user current location
+  Future<LocationData?> getLocaiton() async {
     var location = new Location();
     LocationData? currentLocation;
     try {
@@ -244,18 +247,19 @@ class _ChargerListScreenState extends State<ChargerListScreen> {
     return currentLocation;
   }
 
+  //Search location through filter
   Future<void> searchByFilter(
     String type,
     String area,
-    String min_kw,
-    String max_kw,
+    String minkw,
+    String maxkw,
     String limit,
   ) async {
     final chargers = await HttpServicePortSearch.getFilterCarparks(
       type,
       area,
-      min_kw,
-      max_kw,
+      minkw,
+      maxkw,
       limit,
     );
     print("""
@@ -283,16 +287,17 @@ long: ${charger.longitude}
           markerId: MarkerId(charger.id ?? ""),
           position: LatLng(charger.latitude ?? 0.0, charger.longitude ?? 0.0),
           infoWindow: InfoWindow(title: charger.name),
-          onTap: () => _showChargerBottomSheetSearch(charger),
+          onTap: () => showChargerBottomSheetSearch(charger),
         );
       }).toSet();
 
       setState(() {
-        _markers = newMarkers;
+        markers = newMarkers;
       });
     }
   }
 
+  //Search location through area
   Future<void> searchByArea(String query) async {
     String typeContent = "";
 
@@ -338,17 +343,18 @@ long: ${charger.longitude}
           markerId: MarkerId(charger.id ?? ""),
           position: LatLng(charger.latitude ?? 0.0, charger.longitude ?? 0.0),
           infoWindow: InfoWindow(title: charger.name),
-          onTap: () => _showChargerBottomSheetSearch(charger),
+          onTap: () => showChargerBottomSheetSearch(charger),
         );
       }).toSet();
 
       setState(() {
-        _markers = newMarkers;
+        markers = newMarkers;
       });
     }
   }
 
-  Future<void> _determinePosition() async {
+  //Set initial location or current
+  Future<void> determinePosition() async {
     LocationPermission permission;
 
     permission = await Geolocator.checkPermission();
@@ -358,42 +364,43 @@ long: ${charger.longitude}
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         setState(() {
-          _locationPermissionGranted = false;
-          _isLoadingLocation = false;
+          locationPermissionGranted = false;
+          isLoadingLocation = false;
         });
         return;
       }
     }
 
     setState(() {
-      _locationPermissionGranted = true;
+      locationPermissionGranted = true;
     });
 
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      _currentPosition = position;
+      currentPosition = position;
       setState(() {
-        _initialPosition = LatLng(position.latitude, position.longitude);
-        _isLoadingLocation = false;
+        initialPosition = LatLng(position.latitude, position.longitude);
+        isLoadingLocation = false;
       });
 
-      if (_mapController.isCompleted) {
-        final controller = await _mapController.future;
+      if (mapController.isCompleted) {
+        final controller = await mapController.future;
         controller.animateCamera(
-          CameraUpdate.newLatLngZoom(_initialPosition, 14),
+          CameraUpdate.newLatLngZoom(initialPosition, 14),
         );
       }
     } catch (e) {
-      print('Error getting location: $e');
+      print('Error getting location');
       setState(() {
-        _isLoadingLocation = false;
+        isLoadingLocation = false;
       });
     }
   }
 
-  Future<void> _loadChargers() async {
+  //Load all nearby charger
+  Future<void> loadChargers() async {
     String typeContent = "";
 
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -440,7 +447,7 @@ long: ${charger.longitude}
                         ==============================
                             ==============================
 """);
-    userLocation = await _getLocaiton();
+    userLocation = await getLocaiton();
 
     final chargers = await HttpServicePort.getCarparks(
       typeContent,
@@ -453,17 +460,18 @@ long: ${charger.longitude}
           markerId: MarkerId(charger.id),
           position: LatLng(charger.latitude, charger.longitude),
           infoWindow: InfoWindow(title: charger.name),
-          onTap: () => _showChargerBottomSheet(charger),
+          onTap: () => showChargerBottomSheet(charger),
         );
       }).toSet();
 
       setState(() {
-        _markers = newMarkers;
+        markers = newMarkers;
       });
     }
   }
 
-  Future<void> _loadRecentChargers() async {
+  //Load all recent charger being routed
+  Future<void> loadRecentChargers() async {
     String? uid = await FirebaseAuth.instance.currentUser?.uid;
     final data = await FirebaseFirestore.instance
         .collection("account")
@@ -495,17 +503,18 @@ long: ${charger.longitude}
           markerId: MarkerId(charger["id"].toString()),
           position: LatLng(charger["latitude"], charger["longitude"]),
           infoWindow: InfoWindow(title: charger["name"]),
-          onTap: () => _showRecentChargerBottomSheet(charger),
+          onTap: () => showRecentChargerBottomSheet(charger),
         );
       }).toSet();
 
       setState(() {
-        _markers = newMarkers;
+        markers = newMarkers;
       });
     }
   }
 
-  Future<void> _loadFavouriteChargers() async {
+  //Load all favouruite charger that was saved
+  Future<void> loadFavouriteChargers() async {
     String? uid = await FirebaseAuth.instance.currentUser?.uid;
     final data = await FirebaseFirestore.instance
         .collection("account")
@@ -548,18 +557,19 @@ long: ${charger.longitude}
             markerId: MarkerId(charger["id"].toString()),
             position: LatLng(charger["latitude"], charger["longitude"]),
             infoWindow: InfoWindow(title: charger["name"]),
-            onTap: () => _showRecentChargerBottomSheet(charger),
+            onTap: () => showRecentChargerBottomSheet(charger),
           );
         }).toSet();
 
         setState(() {
-          _markers = newMarkers;
+          markers = newMarkers;
         });
       }
     }
   }
 
-  void _showRecentChargerBottomSheet(charger) {
+  //Show the recent saved location info
+  void showRecentChargerBottomSheet(charger) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -582,7 +592,7 @@ long: ${charger.longitude}
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
+                    color: Colors.black,
                     blurRadius: 10,
                     offset: Offset(0, -2),
                   ),
@@ -596,12 +606,12 @@ long: ${charger.longitude}
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Colors.black,
                     ),
                   ),
                   SizedBox(height: 8),
 
-                  if (charger['photo'] != null)
+                  if (charger["photo"] != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
@@ -615,13 +625,13 @@ long: ${charger.longitude}
                   SizedBox(height: 8),
                   Text(
                     charger["formattedAddress"],
-                    style: TextStyle(color: Colors.black87),
+                    style: TextStyle(color: Colors.black),
                   ),
 
                   if (charger["phoneNumber"] != null) ...[
                     SizedBox(height: 4),
                     Text(
-                      'Phone: ${charger["phoneNumber"]}',
+                      "Phone: ${charger["phoneNumber"]}",
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                   ],
@@ -641,7 +651,7 @@ long: ${charger.longitude}
                           ),
                         if (charger["reviewCount"] != null) ...[
                           SizedBox(width: 10),
-                          Text('(${charger["reviewCount"]} reviews)'),
+                          Text("(${charger["reviewCount"]} reviews)"),
                         ],
                       ],
                     ),
@@ -655,7 +665,7 @@ long: ${charger.longitude}
 
                   ...charger["connectors"].map(
                     (c) => Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
+                      padding: const EdgeInsets.only(top: 4),
                       child: Row(
                         children: [
                           Icon(Icons.ev_station, size: 20, color: Colors.green),
@@ -683,9 +693,10 @@ long: ${charger.longitude}
                         ),
                       ),
                       onTap: () async {
-                        final url = charger["website"]!;
-                        if (await canLaunch(url)) {
-                          await launch(url);
+                        final website = charger["website"]!;
+                        final Uri websiteFilter = Uri.parse(website);
+                        if (await canLaunchUrl(websiteFilter)) {
+                          await launchUrl(websiteFilter);
                         }
                       },
                     ),
@@ -703,9 +714,13 @@ long: ${charger.longitude}
                         ),
                       ),
                       onTap: () async {
-                        final url = charger["placeLink"]!;
-                        if (await canLaunch(url)) {
-                          await launch(url);
+                        final googleMapLink = charger["placeLink"]!;
+                        final Uri googleMapLinkFilter = Uri.parse(
+                          googleMapLink,
+                        );
+
+                        if (await canLaunchUrl(googleMapLinkFilter)) {
+                          await launchUrl(googleMapLinkFilter);
                         }
                       },
                     ),
@@ -720,7 +735,7 @@ long: ${charger.longitude}
                       style: TextStyle(color: Colors.black),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFD54F),
+                      backgroundColor: Color(0xFFFFDD00),
                       minimumSize: Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -729,7 +744,7 @@ long: ${charger.longitude}
                     ),
                     onPressed: () {
                       Navigator.pop(context);
-                      _startRecentRoutingTo(charger);
+                      startDbSavedRoutingTo(charger);
                     },
                   ),
                 ],
@@ -741,27 +756,28 @@ long: ${charger.longitude}
     );
   }
 
-  Future<void> _startRecentRoutingTo(charger) async {
-    _getLocaiton();
-    _determinePosition();
-    if (_currentPosition == null) {
+  //Start the route for db saved locations
+  Future<void> startDbSavedRoutingTo(charger) async {
+    getLocaiton();
+    determinePosition();
+    if (currentPosition == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Current location not available.')),
       );
       return;
     }
 
-    await _positionStreamSubscription?.cancel();
+    await positionStreamSubscription?.cancel();
 
     setState(() {
-      _isRouting = true;
-      _selectedRecentCharger = charger;
-      _markers = {
+      isRouting = true;
+      selectedRecentCharger = charger;
+      markers = {
         Marker(
           markerId: MarkerId('currentLocation'),
           position: LatLng(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
+            currentPosition!.latitude,
+            currentPosition!.longitude,
           ),
           infoWindow: InfoWindow(title: 'Your Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
@@ -773,7 +789,7 @@ long: ${charger.longitude}
         ),
       };
 
-      _polylines.clear();
+      polylines.clear();
       polylineCoordinates.clear();
     });
 
@@ -781,8 +797,8 @@ long: ${charger.longitude}
     final v2Response = await polylinePoints.getRouteBetweenCoordinatesV2(
       request: RoutesApiRequest(
         origin: PointLatLng(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
+          currentPosition!.latitude,
+          currentPosition!.longitude,
         ),
         destination: PointLatLng(charger["latitude"], charger["longitude"]),
         travelMode: TravelMode.driving,
@@ -796,7 +812,7 @@ long: ${charger.longitude}
       }
 
       setState(() {
-        _polylines.add(
+        polylines.add(
           Polyline(
             polylineId: PolylineId('route'),
             color: Colors.teal,
@@ -809,23 +825,23 @@ long: ${charger.longitude}
       print('Error fetching route: ${legacyResult.errorMessage}');
     }
 
-    final controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
+    final controller = await mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(initialPosition, 14));
 
-    _positionStreamSubscription =
+    positionStreamSubscription =
         Geolocator.getPositionStream(
           locationSettings: LocationSettings(
             accuracy: LocationAccuracy.high,
             distanceFilter: 10,
           ),
         ).listen((Position position) async {
-          _currentPosition = position;
+          currentPosition = position;
 
           LatLng currentLatLng = LatLng(position.latitude, position.longitude);
 
           setState(() {
-            _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
-            _markers.add(
+            markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+            markers.add(
               Marker(
                 markerId: MarkerId('currentLocation'),
                 position: currentLatLng,
@@ -847,12 +863,12 @@ long: ${charger.longitude}
           );
 
           if (distance < 100) {
-            await _positionStreamSubscription?.cancel();
+            await positionStreamSubscription?.cancel();
 
             setState(() {
-              _isRouting = false;
-              _selectedCharger = null;
-              _polylines.clear();
+              isRouting = false;
+              selectedCharger = null;
+              polylines.clear();
               polylineCoordinates.clear();
             });
 
@@ -864,9 +880,9 @@ long: ${charger.longitude}
                   TextButton(
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await _loadRecentChargers();
+                      await loadRecentChargers();
                       controller.animateCamera(
-                        CameraUpdate.newLatLngZoom(_initialPosition, 14),
+                        CameraUpdate.newLatLngZoom(initialPosition, 14),
                       );
                     },
                     child: Text('OK'),
@@ -878,7 +894,8 @@ long: ${charger.longitude}
         });
   }
 
-  void _showChargerBottomSheetSearch(DatumSearch charger) {
+  //Show the charger info from search function
+  void showChargerBottomSheetSearch(DatumSearch charger) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1067,7 +1084,7 @@ long: ${charger.longitude}
                     ),
                     onPressed: () {
                       Navigator.pop(context);
-                      _startRoutingToSearch(charger);
+                      startRoutingToSearch(charger);
                       saveRecentRouteToDbSearch(charger);
                     },
                   ),
@@ -1080,6 +1097,7 @@ long: ${charger.longitude}
     );
   }
 
+  //Save route to recents db
   void saveRecentRouteToDb(Datum charger) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     final info = await FirebaseFirestore.instance
@@ -1117,8 +1135,9 @@ long: ${charger.longitude}
     });
   }
 
+  //Sabe favourite to favourite db
   void saveFavouriteRouteToDb(Datum charger) async {
-    _polylines.clear();
+    polylines.clear();
     polylineCoordinates.clear();
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     final info = await FirebaseFirestore.instance
@@ -1156,7 +1175,8 @@ long: ${charger.longitude}
     });
   }
 
-  void _showChargerBottomSheet(Datum charger) {
+  //Show charger info
+  void showChargerBottomSheet(Datum charger) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1279,9 +1299,10 @@ long: ${charger.longitude}
                         ),
                       ),
                       onTap: () async {
-                        final url = charger.website!;
-                        if (await canLaunch(url)) {
-                          await launch(url);
+                        final url = Uri.parse(charger.website!);
+
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
                         }
                       },
                     ),
@@ -1299,9 +1320,10 @@ long: ${charger.longitude}
                         ),
                       ),
                       onTap: () async {
-                        final url = charger.placeLink!;
-                        if (await canLaunch(url)) {
-                          await launch(url);
+                        final url = Uri.parse(charger.placeLink!);
+
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
                         }
                       },
                     ),
@@ -1345,7 +1367,7 @@ long: ${charger.longitude}
                     ),
                     onPressed: () {
                       Navigator.pop(context);
-                      _startRoutingTo(charger);
+                      startRoutingTo(charger);
                       saveRecentRouteToDb(charger);
                     },
                   ),
@@ -1358,28 +1380,29 @@ long: ${charger.longitude}
     );
   }
 
-  Future<void> _startRoutingToSearch(DatumSearch charger) async {
-    _getLocaiton();
-    _determinePosition();
-    if (_currentPosition == null) {
+  //Route to search
+  Future<void> startRoutingToSearch(DatumSearch charger) async {
+    getLocaiton();
+    determinePosition();
+    if (currentPosition == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Current location not available.')),
       );
       return;
     }
 
-    await _positionStreamSubscription?.cancel();
+    await positionStreamSubscription?.cancel();
 
     setState(() {
-      _isRouting = true;
-      _selectedChargerSearch = charger;
+      isRouting = true;
+      selectedChargerSearch = charger;
 
-      _markers = {
+      markers = {
         Marker(
           markerId: MarkerId('currentLocation'),
           position: LatLng(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
+            currentPosition!.latitude,
+            currentPosition!.longitude,
           ),
           infoWindow: InfoWindow(title: 'Your Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
@@ -1391,7 +1414,7 @@ long: ${charger.longitude}
         ),
       };
 
-      _polylines.clear();
+      polylines.clear();
       polylineCoordinates.clear();
     });
 
@@ -1399,8 +1422,8 @@ long: ${charger.longitude}
     final v2Response = await polylinePoints.getRouteBetweenCoordinatesV2(
       request: RoutesApiRequest(
         origin: PointLatLng(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
+          currentPosition!.latitude,
+          currentPosition!.longitude,
         ),
         destination: PointLatLng(
           charger.latitude ?? 0.0,
@@ -1417,7 +1440,7 @@ long: ${charger.longitude}
       }
 
       setState(() {
-        _polylines.add(
+        polylines.add(
           Polyline(
             polylineId: PolylineId('route'),
             color: Colors.teal,
@@ -1430,23 +1453,23 @@ long: ${charger.longitude}
       print('Error fetching route: ${legacyResult.errorMessage}');
     }
 
-    final controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
+    final controller = await mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(initialPosition, 14));
 
-    _positionStreamSubscription =
+    positionStreamSubscription =
         Geolocator.getPositionStream(
           locationSettings: LocationSettings(
             accuracy: LocationAccuracy.high,
             distanceFilter: 10,
           ),
         ).listen((Position position) async {
-          _currentPosition = position;
+          currentPosition = position;
 
           LatLng currentLatLng = LatLng(position.latitude, position.longitude);
 
           setState(() {
-            _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
-            _markers.add(
+            markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+            markers.add(
               Marker(
                 markerId: MarkerId('currentLocation'),
                 position: currentLatLng,
@@ -1468,12 +1491,12 @@ long: ${charger.longitude}
           );
 
           if (distance < 100) {
-            await _positionStreamSubscription?.cancel();
+            await positionStreamSubscription?.cancel();
 
             setState(() {
-              _isRouting = false;
-              _selectedCharger = null;
-              _polylines.clear();
+              isRouting = false;
+              selectedCharger = null;
+              polylines.clear();
               polylineCoordinates.clear();
             });
 
@@ -1485,9 +1508,9 @@ long: ${charger.longitude}
                   TextButton(
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await _restoreAllChargers();
+                      await restoreAllChargers();
                       controller.animateCamera(
-                        CameraUpdate.newLatLngZoom(_initialPosition, 14),
+                        CameraUpdate.newLatLngZoom(initialPosition, 14),
                       );
                     },
                     child: Text('OK'),
@@ -1499,27 +1522,28 @@ long: ${charger.longitude}
         });
   }
 
-  Future<void> _startRoutingTo(Datum charger) async {
-    _getLocaiton();
-    _determinePosition();
-    if (_currentPosition == null) {
+  //Route to cahrger
+  Future<void> startRoutingTo(Datum charger) async {
+    getLocaiton();
+    determinePosition();
+    if (currentPosition == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Current location not available.')),
       );
       return;
     }
 
-    await _positionStreamSubscription?.cancel();
+    await positionStreamSubscription?.cancel();
 
     setState(() {
-      _isRouting = true;
-      _selectedCharger = charger;
-      _markers = {
+      isRouting = true;
+      selectedCharger = charger;
+      markers = {
         Marker(
           markerId: MarkerId('currentLocation'),
           position: LatLng(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
+            currentPosition!.latitude,
+            currentPosition!.longitude,
           ),
           infoWindow: InfoWindow(title: 'Your Location'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
@@ -1531,7 +1555,7 @@ long: ${charger.longitude}
         ),
       };
 
-      _polylines.clear();
+      polylines.clear();
       polylineCoordinates.clear();
     });
 
@@ -1539,8 +1563,8 @@ long: ${charger.longitude}
     final v2Response = await polylinePoints.getRouteBetweenCoordinatesV2(
       request: RoutesApiRequest(
         origin: PointLatLng(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
+          currentPosition!.latitude,
+          currentPosition!.longitude,
         ),
         destination: PointLatLng(charger.latitude, charger.longitude),
         travelMode: TravelMode.driving,
@@ -1554,7 +1578,7 @@ long: ${charger.longitude}
       }
 
       setState(() {
-        _polylines.add(
+        polylines.add(
           Polyline(
             polylineId: PolylineId('route'),
             color: Colors.teal,
@@ -1567,23 +1591,23 @@ long: ${charger.longitude}
       print('Error fetching route: ${legacyResult.errorMessage}');
     }
 
-    final controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
+    final controller = await mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(initialPosition, 14));
 
-    _positionStreamSubscription =
+    positionStreamSubscription =
         Geolocator.getPositionStream(
           locationSettings: LocationSettings(
             accuracy: LocationAccuracy.high,
             distanceFilter: 10,
           ),
         ).listen((Position position) async {
-          _currentPosition = position;
+          currentPosition = position;
 
           LatLng currentLatLng = LatLng(position.latitude, position.longitude);
 
           setState(() {
-            _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
-            _markers.add(
+            markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+            markers.add(
               Marker(
                 markerId: MarkerId('currentLocation'),
                 position: currentLatLng,
@@ -1605,12 +1629,12 @@ long: ${charger.longitude}
           );
 
           if (distance < 100) {
-            await _positionStreamSubscription?.cancel();
+            await positionStreamSubscription?.cancel();
 
             setState(() {
-              _isRouting = false;
-              _selectedCharger = null;
-              _polylines.clear();
+              isRouting = false;
+              selectedCharger = null;
+              polylines.clear();
               polylineCoordinates.clear();
             });
 
@@ -1622,9 +1646,9 @@ long: ${charger.longitude}
                   TextButton(
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await _restoreAllChargers();
+                      await restoreAllChargers();
                       controller.animateCamera(
-                        CameraUpdate.newLatLngZoom(_initialPosition, 14),
+                        CameraUpdate.newLatLngZoom(initialPosition, 14),
                       );
                     },
                     child: Text('OK'),
@@ -1636,7 +1660,8 @@ long: ${charger.longitude}
         });
   }
 
-  Future<void> _restoreAllChargers() async {
+  //Restart chargers
+  Future<void> restoreAllChargers() async {
     String typeContent = "";
 
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -1661,7 +1686,7 @@ long: ${charger.longitude}
         typeContent += "CCS,";
       }
     }
-    userLocation = await _getLocaiton();
+    userLocation = await getLocaiton();
     print("""
     ==============================
         ==============================
@@ -1683,32 +1708,34 @@ long: ${charger.longitude}
           markerId: MarkerId(charger.id),
           position: LatLng(charger.latitude, charger.longitude),
           infoWindow: InfoWindow(title: charger.name),
-          onTap: () => _showChargerBottomSheet(charger),
+          onTap: () => showChargerBottomSheet(charger),
         );
       }).toSet();
 
       setState(() {
-        _markers = allMarkers;
+        markers = allMarkers;
       });
     }
   }
 
-  Future<void> _endRoute() async {
-    await _positionStreamSubscription?.cancel();
+  //End routes
+  Future<void> endRoute() async {
+    await positionStreamSubscription?.cancel();
 
     setState(() {
-      _isRouting = false;
-      _selectedCharger = null;
-      _polylines.clear();
+      isRouting = false;
+      selectedCharger = null;
+      polylines.clear();
       polylineCoordinates.clear();
     });
 
-    await _restoreAllChargers();
+    await restoreAllChargers();
 
-    final controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
+    final controller = await mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(initialPosition, 14));
   }
 
+  //Save search charger into recent
   void saveRecentRouteToDbSearch(DatumSearch charger) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     final info = await FirebaseFirestore.instance
@@ -1746,8 +1773,9 @@ long: ${charger.longitude}
     });
   }
 
+  //Save search charger into favourites
   void saveFavouriteRouteToDbSearch(DatumSearch charger) async {
-    _polylines.clear();
+    polylines.clear();
     polylineCoordinates.clear();
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     final info = await FirebaseFirestore.instance
@@ -1787,32 +1815,26 @@ long: ${charger.longitude}
     });
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    _mapController.complete(controller);
+  //Create map
+  void onMapCreated(GoogleMapController controller) {
+    mapController.complete(controller);
 
-    if (!_isLoadingLocation && _locationPermissionGranted) {
-      controller.animateCamera(
-        CameraUpdate.newLatLngZoom(_initialPosition, 14),
-      );
+    if (!isLoadingLocation && locationPermissionGranted) {
+      controller.animateCamera(CameraUpdate.newLatLngZoom(initialPosition, 14));
     }
   }
 
   @override
   void dispose() {
-    _positionStreamSubscription?.cancel();
+    positionStreamSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoadingLocation) {
+    if (isLoadingLocation) {
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xFFE3F2FD),
-          foregroundColor: Colors.black87,
-          title: Text("EV Chargers Near You"),
-          elevation: 0,
-        ),
+        appBar: AppBar(title: Text("EV Chargers Near You"), elevation: 0),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -1823,18 +1845,18 @@ long: ${charger.longitude}
         child: Stack(
           children: [
             GoogleMap(
-              onMapCreated: _onMapCreated,
+              onMapCreated: onMapCreated,
               initialCameraPosition: CameraPosition(
-                target: _initialPosition,
+                target: initialPosition,
                 zoom: 14,
               ),
-              myLocationEnabled: _locationPermissionGranted,
+              myLocationEnabled: locationPermissionGranted,
               myLocationButtonEnabled: true,
-              markers: _markers,
-              polylines: _polylines,
+              markers: markers,
+              polylines: polylines,
             ),
 
-            if (_isRouting)
+            if (isRouting)
               Positioned(
                 bottom: 20,
                 left: 20,
@@ -1872,7 +1894,7 @@ long: ${charger.longitude}
                     );
 
                     if (shouldEnd == true) {
-                      await _endRoute();
+                      await endRoute();
                     }
                   },
                 ),
@@ -1895,6 +1917,7 @@ long: ${charger.longitude}
                         if (value.isNotEmpty) {
                           await searchByArea(value);
                         }
+                        searchAreaController.clear();
                       },
                     ),
                     border: OutlineInputBorder(
@@ -1930,7 +1953,7 @@ long: ${charger.longitude}
                     IconButton(
                       onPressed: () async {
                         areaQuery.clear();
-                        await _loadFavouriteChargers();
+                        await loadFavouriteChargers();
                       },
                       icon: const Icon(Icons.favorite),
                     ),
@@ -1938,7 +1961,7 @@ long: ${charger.longitude}
 
                     IconButton(
                       onPressed: () {
-                        _loadChargers();
+                        loadChargers();
                       },
                       icon: const Icon(Icons.map),
                     ),
