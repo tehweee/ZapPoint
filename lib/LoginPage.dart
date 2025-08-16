@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:testing_rapidapi_2/ChargingListPage.dart';
-import 'package:testing_rapidapi_2/RegisterPage.dart';
+import 'ChargingListPage.dart';
+import 'RegisterPage.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -33,55 +33,61 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (context) => ChargerListScreen()),
       );
     } on FirebaseAuthException catch (e) {
-      print('Failed to login user: ${e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to login please try again!'),
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A40),
+      backgroundColor: Color(0xFF1A1A40),
       resizeToAvoidBottomInset: false,
       body: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: screenSize.height * 0.15),
-            child: const Text(
+            padding: EdgeInsets.only(top: 130),
+            child: Text(
               'Login',
               style: TextStyle(
                 color: Color(0xFFFFDD00),
-                fontSize: 40.0,
+                fontSize: 40,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'ZapPointFont',
               ),
             ),
           ),
 
-          const Spacer(),
+          Spacer(),
           Container(
-            width: screenSize.width,
-            height: screenSize.height * 0.65,
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            decoration: const BoxDecoration(
+            width: 700,
+            height: 500,
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            decoration: BoxDecoration(
               color: Color(0xFF21A5BF),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(50.0),
-                topRight: Radius.circular(50.0),
+                topLeft: Radius.circular(50),
+                topRight: Radius.circular(50),
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: EdgeInsets.only(left: 12.0, bottom: 8.0),
+                    padding: EdgeInsets.only(left: 12, bottom: 8),
                     child: Text(
                       'Email',
                       style: TextStyle(
                         color: Color(0xFF1A1A40),
-                        fontSize: 16.0,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -93,26 +99,26 @@ class _LoginPageState extends State<LoginPage> {
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
+                      borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 15.0,
-                      horizontal: 20.0,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 20,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 30.0),
-                const Align(
+                SizedBox(height: 30),
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: EdgeInsets.only(left: 12.0, bottom: 8.0),
+                    padding: EdgeInsets.only(left: 12, bottom: 8),
                     child: Text(
                       'Password',
                       style: TextStyle(
                         color: Color(0xFF1A1A40),
-                        fontSize: 16.0,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -125,32 +131,33 @@ class _LoginPageState extends State<LoginPage> {
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
+                      borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 15.0,
-                      horizontal: 20.0,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 20,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 50.0),
+                SizedBox(height: 50),
                 ElevatedButton(
                   onPressed: () async {
                     await loginUser();
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
+                    minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Login',
                     style: TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'ZapPointFont',
                     ),
                   ),
                 ),
@@ -163,22 +170,20 @@ class _LoginPageState extends State<LoginPage> {
         onPressed: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const RegisterPage()),
+            MaterialPageRoute(builder: (context) => RegisterPage()),
           );
         },
-        label: const Text(
-          'Register',
+        label: Text(
+          "Don't have an account yet? Register Now!",
           style: TextStyle(
             color: Color(0xFF1A1A40),
             fontWeight: FontWeight.bold,
           ),
         ),
-        icon: const Icon(Icons.login),
-        backgroundColor: const Color(0xFFFFDD00),
-        foregroundColor: const Color(0xFF1A1A40),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
-        ),
+        icon: Icon(Icons.login),
+        backgroundColor: Color(0xFFFFDD00),
+        foregroundColor: Color(0xFF1A1A40),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

@@ -6,7 +6,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A40),
+      backgroundColor: Color(0xFF1A1A40),
       body: Column(
         children: <Widget>[
           Padding(
@@ -14,8 +14,8 @@ class WelcomePage extends StatelessWidget {
             child: Text(
               'ZapPoint',
               style: TextStyle(
-                color: const Color(0xFFFFDD00),
-                fontSize: 40.0,
+                color: Color(0xFFFFDD00),
+                fontSize: 40,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'ZapPointFont',
               ),
@@ -24,75 +24,75 @@ class WelcomePage extends StatelessWidget {
 
           Container(
             height: 624,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Color(0xFF21A5BF),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(50.0),
-                topRight: Radius.circular(50.0),
+                topLeft: Radius.circular(50),
+                topRight: Radius.circular(50),
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Text(
+                  Text(
                     'Make finding easier\nwith ZapPoint',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFF1A1A40),
-                      fontSize: 28.0,
+                      color: Color(0xFFFFDD00),
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'ZapPointFont',
                     ),
                   ),
 
-                  const SizedBox(height: 50.0),
+                  SizedBox(height: 50),
 
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => LoginPage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
+                      minimumSize: Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30),
                       ),
+                      backgroundColor: Color(0xFF1A1A40),
+                      foregroundColor: Colors.white,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Login',
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 20.0),
+                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => RegisterPage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
+                      minimumSize: Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30),
                       ),
+                      backgroundColor: Color(0xFF1A1A40),
+                      foregroundColor: Colors.white,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Register',
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

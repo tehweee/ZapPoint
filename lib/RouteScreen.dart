@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'const.dart';
 
 class RouteScreen extends StatefulWidget {
   final LatLng start;
@@ -16,7 +17,7 @@ class _RouteScreenState extends State<RouteScreen> {
   GoogleMapController? _controller;
   Set<Polyline> _polylines = {};
   List<LatLng> polylineCoordinates = [];
-  final String googleApiKey = 'AIzaSyDpwW-F7znMozHqzomo1q24dNhJ2G9I5Bs';
+  final String googleApiKey = GOOGLE_MAP_API;
 
   PolylinePoints get polylinePoints => PolylinePoints(apiKey: googleApiKey);
   @override

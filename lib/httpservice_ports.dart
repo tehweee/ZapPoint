@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'Chargers.dart';
+import 'const.dart';
 
 class HttpServicePort {
-  static const Map<String, String> _headers = {
-    'x-rapidapi-key': 'f72197243bmshf94cb6e9a6ce889p14da50jsn6ed480952fb4',
+  static final Map<String, String> _headers = {
+    'x-rapidapi-key': EV_CHARGER_API,
     'x-rapidapi-host': 'ev-charge-finder.p.rapidapi.com',
   };
 

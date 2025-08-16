@@ -230,25 +230,60 @@ class OpeningHours {
   factory OpeningHours.fromJson(Map<String, dynamic> json) => OpeningHours(
     thursday: json["Thursday"] == null
         ? []
-        : List<Day>.from(json["Thursday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Thursday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
     friday: json["Friday"] == null
         ? []
-        : List<Day>.from(json["Friday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Friday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
     saturday: json["Saturday"] == null
         ? []
-        : List<Day>.from(json["Saturday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Saturday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
     sunday: json["Sunday"] == null
         ? []
-        : List<Day>.from(json["Sunday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Sunday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
     monday: json["Monday"] == null
         ? []
-        : List<Day>.from(json["Monday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Monday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
     tuesday: json["Tuesday"] == null
         ? []
-        : List<Day>.from(json["Tuesday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Tuesday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
     wednesday: json["Wednesday"] == null
         ? []
-        : List<Day>.from(json["Wednesday"]!.map((x) => dayValues.map[x]!)),
+        : List<Day>.from(
+            json["Wednesday"]!
+                .map((x) => dayValues.map[x])
+                .where((e) => e != null)
+                .cast<Day>(),
+          ),
   );
 
   Map<String, dynamic> toJson() => {

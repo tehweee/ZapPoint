@@ -1,11 +1,6 @@
 import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'WelcomePage.dart';
-import 'LoginPage.dart';
-import 'RegisterPage.dart';
-import 'ChargingListPage.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -16,7 +11,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(seconds: 4), () {
+    Timer(Duration(seconds: 3), () {
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (context) => WelcomePage()));
@@ -35,13 +30,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
               'ZapPoint',
               style: TextStyle(
                 color: Color(0xFFFFDD00),
-                fontSize: 40.0,
+                fontSize: 80,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'ZapPointFont',
               ),
             ),
-            SizedBox(height: 20.0),
-            Image.asset('assets/ZapPoint_Logo_Transparent.png', height: 100.0),
+            SizedBox(height: 20),
+            Image.asset('assets/ZapPoint_Logo_Transparent.png', height: 150),
           ],
         ),
       ),

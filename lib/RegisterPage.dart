@@ -5,7 +5,7 @@ import 'LoginPage.dart';
 import 'ChargingListPage.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  RegisterPage({super.key});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -38,7 +38,14 @@ class _RegisterPageState extends State<RegisterPage> {
       await uploadUserToDb(uid);
       print(userCredential);
     } on FirebaseAuthException catch (e) {
-      print('Failed to create user: ${e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to register please try again!'),
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -48,7 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final username = usernameController.text.trim();
     try {
       final data = FirebaseFirestore.instance.collection("account")
-        ..doc(uid).set({"vehicle": null, "profile_pic": null});
+        ..doc(uid).set({"vehicle": null, "recents": null});
       print(data);
       Navigator.pushReplacement(
         context,
@@ -60,50 +67,49 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A40),
+      backgroundColor: Color(0xFF1A1A40),
       resizeToAvoidBottomInset: false,
       body: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: screenSize.height * 0.15),
-            child: const Text(
+            padding: EdgeInsets.only(top: 70),
+            child: Text(
               'Register',
               style: TextStyle(
                 color: Color(0xFFFFDD00),
-                fontSize: 40.0,
+                fontSize: 40,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'ZapPointFont',
               ),
             ),
           ),
 
-          const Spacer(),
+          Spacer(),
           Container(
-            width: screenSize.width,
-            height: screenSize.height * 0.65,
-            decoration: const BoxDecoration(
+            width: 700,
+            height: 600,
+            decoration: BoxDecoration(
               color: Color(0xFF21A5BF),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(50.0),
-                topRight: Radius.circular(50.0),
+                topLeft: Radius.circular(50),
+                topRight: Radius.circular(50),
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 12.0, bottom: 8.0),
+                      padding: EdgeInsets.only(left: 12, bottom: 8),
                       child: Text(
                         'Email',
                         style: TextStyle(
                           color: Color(0xFF1A1A40),
-                          fontSize: 16.0,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -115,26 +121,26 @@ class _RegisterPageState extends State<RegisterPage> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15.0,
-                        horizontal: 20.0,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 30.0),
-                  const Align(
+                  SizedBox(height: 30),
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 12.0, bottom: 8.0),
+                      padding: EdgeInsets.only(left: 12, bottom: 8),
                       child: Text(
                         'Username',
                         style: TextStyle(
                           color: Color(0xFF1A1A40),
-                          fontSize: 16.0,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -146,26 +152,26 @@ class _RegisterPageState extends State<RegisterPage> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15.0,
-                        horizontal: 20.0,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 30.0),
-                  const Align(
+                  SizedBox(height: 30),
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 12.0, bottom: 8.0),
+                      padding: EdgeInsets.only(left: 12, bottom: 8),
                       child: Text(
                         'Password',
                         style: TextStyle(
                           color: Color(0xFF1A1A40),
-                          fontSize: 16.0,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -178,32 +184,33 @@ class _RegisterPageState extends State<RegisterPage> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15.0,
-                        horizontal: 20.0,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 50.0),
+                  SizedBox(height: 50),
                   ElevatedButton(
                     onPressed: () async {
                       await createUser();
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
+                      minimumSize: Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Register',
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'ZapPointFont',
                       ),
                     ),
                   ),
@@ -217,22 +224,20 @@ class _RegisterPageState extends State<RegisterPage> {
         onPressed: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
-        label: const Text(
+        label: Text(
           'Have an account? Login now!',
           style: TextStyle(
             color: Color(0xFF1A1A40),
             fontWeight: FontWeight.bold,
           ),
         ),
-        icon: const Icon(Icons.login),
-        backgroundColor: const Color(0xFFFFDD00),
-        foregroundColor: const Color(0xFF1A1A40),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
-        ),
+        icon: Icon(Icons.login),
+        backgroundColor: Color(0xFFFFDD00),
+        foregroundColor: Color(0xFF1A1A40),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
